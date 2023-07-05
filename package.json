@@ -1,0 +1,39 @@
+{
+  "name": "com.sumit.camera.file.plugin",
+  "displayName": "Camera File App",
+  "version": "1.0.0",
+  "description": "A cordova application to test camera, file and statusbar plugins",
+  "main": "index.js",
+  "scripts": {
+    "start": "cordova run ios",
+    "start:browser": "cordova run browser",
+    "build": "cordova build ios",
+    "build:browser": "cordova build browser"
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "Apache Cordova Team",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "cordova-browser": "^7.0.0",
+    "cordova-ios": "^6.3.0",
+    "cordova-plugin-camera": "^6.0.0",
+    "cordova-plugin-file": "^7.0.0",
+    "cordova-plugin-statusbar": "^3.0.0"
+  },
+  "cordova": {
+    "platforms": [
+      "ios",
+      "browser"
+    ],
+    "plugins": {
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-file": {},
+      "cordova-plugin-camera": {
+        "CAMERA_USAGE_DESCRIPTION": "Need camera access to catpure images",
+        "PHOTOLIBRARY_USAGE_DESCRIPTION": "Need access to photo library to add images from photo library"
+      }
+    }
+  }
+}
