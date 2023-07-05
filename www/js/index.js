@@ -84,6 +84,19 @@ const app = {
             // Due to WkWebView restrictions images or files can't be read directly using fileURL
             // https://stackoverflow.com/questions/63521746/cordova-load-resource-from-documents-issue-wkwebview
             document.getElementById('imgFile').src = window.WkWebView.convertFilePath(copiedFile.nativeURL);
+
+            // delete the old file from file system from app.permFolder
+            if(app.oldFile) {
+              app.oldFile.remove(
+                function removeSuccess() {
+                  console.log("Successfully deleted the old file");
+                  app.oldFile = copiedFile;
+                },
+                function removeFailure(err) {
+                  console.warn(err);
+                }
+              )
+            }
           },
           function fileCopyFailure(err) {
             console.warn(err);
@@ -108,6 +121,9 @@ const app = {
             app.permFolder = gotDir;
             const msg = 'Created or Opened: ' + gotDir.nativeURL;
             console.log(msg);
+
+            // load old image using the url which was stored on local storage from previous app run
+            app.loadOldImage();
           },
           function getDirectoryFailure(err) {
             const msg = 'An error occurred while creating images folder: ' + err;
@@ -119,6 +135,21 @@ const app = {
         console.warn('Failure callback of resolveFileSystemURL');
       }
     )
+  },
+  loadOldImage: () => {
+    const oldFilePath = localStorage.getItem(app.KEY);
+    if (oldFilePath) {
+      resolveLocalFileSystemURL(
+        oldFilePath,
+        function gotFileSuccess(gotFile) {
+          app.oldFile = gotFile;
+          document.querySelector('#imgFile').src = window.WkWebView.convertFilePath(gotFile.nativeURL);
+        },
+        function gotFileFailure(err) {
+          console.warn(err);
+        }
+      )
+    }
   },
   cordovaDirectoryInfo: () => {
     const documentsDirectory = cordova.file.documentsDirectory;
