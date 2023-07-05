@@ -14,23 +14,76 @@ const app = {
     setTimeout(() => {
       console.log('cordova-file-plugin is ready');
       app.addListeners();
+
+      // create the folder where we will save files
+      app.getOrCreatePermanentFolder();
     }, 2000);
   },
   addStatusbar: () => {
     // add the statusbar placeholder div only on mobile application
     const statusbarClass = 'cordova' in window ? 'active' : '';
     const statusbar = document.querySelector('.statusbar');
-    console.log(statusbarClass, statusbar);
     statusbar.classList.add(statusbarClass);
   },
   addListeners: () => {
     document.querySelector('button#btnCam').addEventListener('click', app.takePicture);
     document.querySelector('button#btnFile').addEventListener('click', app.copyFile);
   },
-  takePicture: () => {
+  takePicture: (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const options = {
+      quality: 100,
+      destinationType: Camera.DestinationType.FILE_URI,
+      sourceType: Camera.PictureSourceType.CAMERA,
+      encodingType: Camera.EncodingType.JPEG,
+      mediaType: Camera.MediaType.PICTURE,
+      allowEdit: true,
+      targetWidth: 400,
+      targetHeight: 400
+    };
+
+    // navigator.camera.getPicture(success, failure, options);
+    navigator.camera.getPicture(
+      function captureSuccess(uri) {
+        app.tempURL = uri;
+        document.querySelector('#imgCamera').src = uri;
+      },
+      function captureError(err) {
+        console.warn(err);
+      },
+      options
+    );
   },
   copyFile: () => {
 
+  },
+  getOrCreatePermanentFolder: () => {
+    const path = cordova.file.dataDirectory;
+
+    resolveLocalFileSystemURL(
+      path,
+      dirEntry => {
+        // using dirEntry get or create the 'images' folder where we will be saving our images
+        // dirEntry.getDirectory(name, { create: true/false }, success, failure);
+        dirEntry.getDirectory(
+          "images",
+          { create: true },
+          function getDirectorySuccess(gotDir) {
+            app.permFolder = gotDir;
+            const msg = 'Created or Opened: ' + gotDir.nativeURL;
+            console.log(msg);
+          },
+          function getDirectoryFailure(err) {
+            const msg = 'An error occurred while creating images folder: ' + err;
+            console.warn(msg);
+          }
+        )
+      },
+      err => {
+        console.warn('Failure callback of resolveFileSystemURL');
+      }
+    )
   },
   cordovaDirectoryInfo: () => {
     const documentsDirectory = cordova.file.documentsDirectory;

@@ -8,4 +8,15 @@
     <content src="index.html" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
+    <platform name="ios">
+      <edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="merge">
+            <string>Need camera access to take pictures. Make sure you have prior permission to take pictures at supplier site.</string>
+        </edit-config>
+        <edit-config target="NSMicrophoneUsageDescription" file="*-Info.plist" mode="merge">
+            <string>Need microphone access to record audio. Make sure you have prior permissoin to record audio at supplier site.</string>
+        </edit-config>
+        <edit-config target="NSPhotoLibraryUsageDescription" file="*-Info.plist" mode="merge">
+            <string>Need access to photo library to get pictures from there.</string>
+        </edit-config>
+    </platform>
 </widget>
