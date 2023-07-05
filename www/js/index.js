@@ -47,7 +47,8 @@ const app = {
     navigator.camera.getPicture(
       function captureSuccess(uri) {
         app.tempURL = uri;
-        document.querySelector('#imgCamera').src = uri;
+        // document.querySelector('#imgCamera').src = uri;
+        document.querySelector('#imgCamera').src = window.WkWebView.convertFilePath(uri);
       },
       function captureError(err) {
         console.warn(err);
@@ -55,12 +56,46 @@ const app = {
       options
     );
   },
-  copyFile: () => {
+  copyFile: (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
+    const filename = Date.now().toString() + ".jpg";
+
+    // resolveLocalFileSystemURL(path, success, failure)
+    resolveLocalFileSystemURL(
+      app.tempURL,
+      entry => {
+        console.log('entry is: ', entry);
+        const msg = `Copying ${entry.name} to ${app.permFolder.nativeURL + filename}`;
+        console.log(msg);
+
+        // entry.copyTo(parent, newName, success, failure);
+        entry.copyTo(
+          app.permFolder,
+          filename,
+          function fileCopySuccess(copiedFile) {
+            // save file name in local storage
+            localStorage.setItem(app.KEY, copiedFile.nativeURL);
+
+            app.permFile = copiedFile;
+            console.log('Adding ', copiedFile, ' to the 2nd image');
+            // document.getElementById("imgFile").src = copiedFile.nativeURL; // OPERATION NOT PERMITTED
+            // Due to WkWebView restrictions images or files can't be read directly using fileURL
+            // https://stackoverflow.com/questions/63521746/cordova-load-resource-from-documents-issue-wkwebview
+            document.getElementById('imgFile').src = window.WkWebView.convertFilePath(copiedFile.nativeURL);
+          },
+          function fileCopyFailure(err) {
+            console.warn(err);
+          }
+        )
+      }
+    )
   },
   getOrCreatePermanentFolder: () => {
     const path = cordova.file.dataDirectory;
 
+    // resolveLocalFileSystemURL(path, success, failure)
     resolveLocalFileSystemURL(
       path,
       dirEntry => {

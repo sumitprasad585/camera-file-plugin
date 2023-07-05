@@ -18,5 +18,7 @@
         <edit-config target="NSPhotoLibraryUsageDescription" file="*-Info.plist" mode="merge">
             <string>Need access to photo library to get pictures from there.</string>
         </edit-config>
+          <preference name="scheme" value="app" />
+          <preference name="hostname" value="localhost" />
     </platform>
 </widget>
